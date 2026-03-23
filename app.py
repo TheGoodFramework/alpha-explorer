@@ -588,9 +588,21 @@ elif mode == "🔬 Single Alpha":
             st.code(info["formula"], language="python")
         with d_col2:
             st.markdown(category_pill(info["category"]), unsafe_allow_html=True)
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.metric("Universe", f"{len(tickers)} stocks")
-            st.metric("Period", f"{(end_date - start_date).days}d")
+            st.markdown(
+                f"""
+                <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
+                    <div style="background:#1e293b; border-radius:8px; padding:10px 14px;">
+                        <div style="font-size:10px; color:#64748b; text-transform:uppercase; letter-spacing:1px;">Universe</div>
+                        <div style="font-size:15px; font-weight:600; color:#e2e8f0; margin-top:2px;">{len(tickers)} stocks</div>
+                    </div>
+                    <div style="background:#1e293b; border-radius:8px; padding:10px 14px;">
+                        <div style="font-size:10px; color:#64748b; text-transform:uppercase; letter-spacing:1px;">Period</div>
+                        <div style="font-size:15px; font-weight:600; color:#e2e8f0; margin-top:2px;">{(end_date - start_date).days} days</div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
     # Run backtest
     if run:
@@ -763,35 +775,68 @@ elif mode == "⚔️ Compare Alphas":
 
             with col_radar:
                 st.subheader("Factor Profile")
+                st.caption("Values normalised 0–1 across selected alphas for shape comparison.")
                 radar_metrics = ["Sharpe Ratio", "Win Rate", "Annual Return"]
-                fig_radar = go.Figure()
-                for i, (num, res) in enumerate(results.items()):
-                    vals = []
+
+                # Extract raw values for all alphas first, then min-max normalise per metric
+                raw_vals = {}
+                for num, res in results.items():
+                    row = []
                     for m in radar_metrics:
                         v = res["metrics"][m]
                         v = float(v.strip("%")) / 100 if "%" in v else float(v)
-                        vals.append(v)
-                    vals.append(vals[0])
+                        row.append(v)
+                    raw_vals[num] = row
+
+                # Per-metric min/max for normalisation
+                metric_min = [min(raw_vals[n][j] for n in raw_vals) for j in range(len(radar_metrics))]
+                metric_max = [max(raw_vals[n][j] for n in raw_vals) for j in range(len(radar_metrics))]
+
+                def normalise(v, lo, hi):
+                    return (v - lo) / (hi - lo) if hi > lo else 0.5
+
+                fig_radar = go.Figure()
+                for i, (num, res) in enumerate(results.items()):
+                    norm = [normalise(raw_vals[num][j], metric_min[j], metric_max[j])
+                            for j in range(len(radar_metrics))]
+                    norm.append(norm[0])  # close the polygon
+                    # Build hover text showing the actual raw value
+                    raw = raw_vals[num]
+                    customdata = [
+                        f"{radar_metrics[j]}: {raw[j]:.2f}" for j in range(len(radar_metrics))
+                    ] + [f"{radar_metrics[0]}: {raw[0]:.2f}"]
                     fig_radar.add_trace(go.Scatterpolar(
-                        r=vals,
+                        r=norm,
                         theta=radar_metrics + [radar_metrics[0]],
                         fill="toself",
                         name=f"Alpha #{num}",
                         line_color=colors[i % len(colors)],
-                        opacity=0.6,
+                        opacity=0.65,
+                        hovertemplate="%{customdata}<extra></extra>",
+                        customdata=customdata,
                     ))
 
                 fig_radar.update_layout(
                     template="plotly_dark",
                     height=400,
-                    margin=dict(l=30, r=30, t=20, b=20),
+                    margin=dict(l=30, r=30, t=20, b=60),
                     paper_bgcolor="#0e1117",
                     plot_bgcolor="#0e1117",
                     polar=dict(
                         bgcolor="#0e1117",
-                        radialaxis=dict(visible=True, gridcolor="#1e293b"),
+                        radialaxis=dict(
+                            visible=True,
+                            range=[0, 1],
+                            tickvals=[0, 0.25, 0.5, 0.75, 1.0],
+                            ticktext=["Low", "", "Mid", "", "High"],
+                            gridcolor="#1e293b",
+                            tickfont=dict(size=9, color="#64748b"),
+                        ),
+                        angularaxis=dict(
+                            tickfont=dict(size=12, color="#cbd5e1"),
+                        ),
                     ),
-                    legend=dict(orientation="h", y=-0.1),
+                    legend=dict(orientation="h", y=-0.15, font=dict(size=11)),
                 )
                 st.plotly_chart(fig_radar, use_container_width=True)
 
