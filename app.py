@@ -26,15 +26,23 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    /* ── Metric cards ── */
+    /* ── Palette ──────────────────────────────────────────────────
+       #FE9321  orange   — primary / equity curve / CTA
+       #6FE3CC  mint     — positive / good
+       #185D7A  teal     — surfaces / borders
+       #C8DB2A  lime     — warning / neutral
+       #EF4687  pink     — negative / bad / drawdown
+    ── */
+
+    /* ── Metric cards (st.metric fallback) ── */
     div[data-testid="stMetric"] {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        background: linear-gradient(135deg, #0d2535 0%, #112f45 100%);
         border-radius: 12px;
         padding: 16px;
-        border: 1px solid #2a2a4a;
+        border: 1px solid #185D7A;
     }
     div[data-testid="stMetric"] label {
-        color: #94a3b8 !important;
+        color: #7ec8d8 !important;
         font-size: 11px !important;
         text-transform: uppercase;
         letter-spacing: 1px;
@@ -42,47 +50,47 @@ st.markdown("""
 
     /* ── Color-coded metric cards ── */
     .metric-good {
-        background: linear-gradient(135deg, #0f2a1a 0%, #0a1f14 100%);
+        background: linear-gradient(135deg, #082820 0%, #051f18 100%);
         border-radius: 12px;
         padding: 20px;
-        border: 1px solid #1a4a2a;
+        border: 1px solid #1a5a40;
         text-align: center;
     }
     .metric-bad {
-        background: linear-gradient(135deg, #2a0f0f 0%, #1f0a0a 100%);
+        background: linear-gradient(135deg, #2a0a1a 0%, #1f0813 100%);
         border-radius: 12px;
         padding: 20px;
-        border: 1px solid #4a1a1a;
+        border: 1px solid #6b1535;
         text-align: center;
     }
     .metric-neutral {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        background: linear-gradient(135deg, #0d2535 0%, #112f45 100%);
         border-radius: 12px;
         padding: 20px;
-        border: 1px solid #2a2a4a;
+        border: 1px solid #185D7A;
         text-align: center;
     }
     .metric-warn {
-        background: linear-gradient(135deg, #2a1f0a 0%, #1f1708 100%);
+        background: linear-gradient(135deg, #1e2208 0%, #161a05 100%);
         border-radius: 12px;
         padding: 20px;
-        border: 1px solid #4a3a1a;
+        border: 1px solid #4a5010;
         text-align: center;
     }
-    .metric-value-good  { font-size: 26px; font-weight: 700; color: #4ade80; }
-    .metric-value-bad   { font-size: 26px; font-weight: 700; color: #f87171; }
-    .metric-value-warn  { font-size: 26px; font-weight: 700; color: #fbbf24; }
-    .metric-value-neutral { font-size: 26px; font-weight: 700; color: #e2e8f0; }
+    .metric-value-good    { font-size: 26px; font-weight: 700; color: #6FE3CC; }
+    .metric-value-bad     { font-size: 26px; font-weight: 700; color: #EF4687; }
+    .metric-value-warn    { font-size: 26px; font-weight: 700; color: #C8DB2A; }
+    .metric-value-neutral { font-size: 26px; font-weight: 700; color: #e8f4f8; }
     .metric-label-style {
         font-size: 11px;
-        color: #94a3b8;
+        color: #7ec8d8;
         text-transform: uppercase;
         letter-spacing: 1px;
         margin-top: 4px;
     }
     .metric-hint {
         font-size: 10px;
-        color: #64748b;
+        color: #4a8a9a;
         margin-top: 2px;
     }
 
@@ -96,15 +104,15 @@ st.markdown("""
         letter-spacing: 0.5px;
         text-transform: uppercase;
     }
-    .pill-momentum       { background: #14532d; color: #4ade80; border: 1px solid #166534; }
-    .pill-mean-reversion { background: #451a03; color: #fbbf24; border: 1px solid #78350f; }
-    .pill-volatility     { background: #450a0a; color: #f87171; border: 1px solid #7f1d1d; }
-    .pill-default        { background: #1e1b4b; color: #a5b4fc; border: 1px solid #312e81; }
+    .pill-momentum       { background: #0d2535; color: #FE9321; border: 1px solid #FE9321; }
+    .pill-mean-reversion { background: #0d2535; color: #6FE3CC; border: 1px solid #6FE3CC; }
+    .pill-volatility     { background: #0d2535; color: #EF4687; border: 1px solid #EF4687; }
+    .pill-default        { background: #0d2535; color: #C8DB2A; border: 1px solid #C8DB2A; }
 
     /* ── Alpha cards ── */
     .alpha-num {
         font-size: 11px;
-        color: #64748b;
+        color: #4a8a9a;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 1px;
@@ -112,71 +120,75 @@ st.markdown("""
     .alpha-name {
         font-size: 15px;
         font-weight: 700;
-        color: #e2e8f0;
+        color: #e8f4f8;
         margin: 4px 0;
     }
     .alpha-desc {
         font-size: 13px;
-        color: #94a3b8;
+        color: #7ec8d8;
         line-height: 1.5;
     }
 
     /* ── Hero banner ── */
     .hero {
-        background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 60%, #0e1117 100%);
+        background: linear-gradient(135deg, #112f45 0%, #0d2535 60%, #07181f 100%);
         border-radius: 16px;
         padding: 32px 36px;
-        border: 1px solid #2a2a4a;
+        border: 1px solid #185D7A;
         margin-bottom: 24px;
     }
-    .hero h1 { color: #e2e8f0; font-size: 28px; margin: 0 0 8px 0; }
-    .hero p  { color: #94a3b8; font-size: 15px; margin: 0; line-height: 1.6; }
+    .hero h1 { color: #e8f4f8; font-size: 28px; margin: 0 0 8px 0; }
+    .hero p  { color: #7ec8d8; font-size: 15px; margin: 0; line-height: 1.6; }
+    .hero p strong { color: #FE9321; }
     .hero-badge {
         display: inline-block;
-        background: #312e81;
-        color: #a5b4fc;
+        background: #185D7A;
+        color: #6FE3CC;
         border-radius: 999px;
         padding: 3px 12px;
         font-size: 12px;
         font-weight: 600;
         margin-bottom: 12px;
+        border: 1px solid #6FE3CC;
     }
 
     /* ── Result count badge ── */
     .result-count {
         display: inline-block;
-        background: #1e293b;
-        color: #94a3b8;
+        background: #0d2535;
+        color: #7ec8d8;
         border-radius: 999px;
         padding: 2px 10px;
         font-size: 12px;
         font-weight: 500;
+        border: 1px solid #185D7A;
     }
 
     /* ── Empty state ── */
     .empty-state {
         text-align: center;
         padding: 60px 20px;
-        color: #475569;
+        color: #4a8a9a;
     }
     .empty-state-icon { font-size: 48px; margin-bottom: 12px; }
-    .empty-state-text { font-size: 16px; font-weight: 500; }
-    .empty-state-sub  { font-size: 14px; color: #334155; margin-top: 6px; }
+    .empty-state-text { font-size: 16px; font-weight: 500; color: #7ec8d8; }
+    .empty-state-sub  { font-size: 14px; color: #4a8a9a; margin-top: 6px; }
 
     /* ── Holdings header ── */
-    .holdings-long  { color: #4ade80; font-weight: 600; }
-    .holdings-short { color: #f87171; font-weight: 600; }
+    .holdings-long  { color: #6FE3CC; font-weight: 600; }
+    .holdings-short { color: #EF4687; font-weight: 600; }
 
     /* ── Ticker chip ── */
     .ticker-chip {
         display: inline-block;
-        background: #1e293b;
-        color: #e2e8f0;
+        background: #112f45;
+        color: #e8f4f8;
         border-radius: 6px;
         padding: 2px 8px;
         font-size: 12px;
         font-weight: 600;
         font-family: monospace;
+        border: 1px solid #185D7A;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -326,6 +338,19 @@ def show_metrics(metrics):
 
 # ── Helper: Charts ─────────────────────────────────────────────────
 
+BG       = "#07181f"
+BG_CARD  = "#0d2535"
+GRID     = "#112f45"
+ORANGE   = "#FE9321"
+MINT     = "#6FE3CC"
+TEAL     = "#185D7A"
+LIME     = "#C8DB2A"
+PINK     = "#EF4687"
+TEXT     = "#e8f4f8"
+MUTED    = "#7ec8d8"
+COMPARE_COLORS = [ORANGE, MINT, LIME, PINK, TEAL, "#ffffff"]
+
+
 def plot_equity_drawdown(result, title="Alpha Performance"):
     fig = make_subplots(
         rows=2, cols=1, shared_xaxes=True,
@@ -337,8 +362,8 @@ def plot_equity_drawdown(result, title="Alpha Performance"):
     fig.add_trace(
         go.Scatter(
             x=eq.index, y=eq.values,
-            name="Portfolio", line=dict(color="#6366f1", width=2),
-            fill="tozeroy", fillcolor="rgba(99,102,241,0.1)",
+            name="Portfolio", line=dict(color=ORANGE, width=2.5),
+            fill="tozeroy", fillcolor="rgba(254,147,33,0.12)",
             hovertemplate="<b>%{x|%b %d, %Y}</b><br>Value: $%{y:.3f}<extra></extra>",
         ),
         row=1, col=1,
@@ -346,7 +371,7 @@ def plot_equity_drawdown(result, title="Alpha Performance"):
     fig.add_trace(
         go.Scatter(
             x=eq.index, y=[1] * len(eq),
-            name="$1 Baseline", line=dict(color="#94a3b8", width=1, dash="dash"),
+            name="$1 Baseline", line=dict(color=MUTED, width=1, dash="dash"),
             hoverinfo="skip",
         ),
         row=1, col=1,
@@ -356,26 +381,29 @@ def plot_equity_drawdown(result, title="Alpha Performance"):
     fig.add_trace(
         go.Scatter(
             x=dd.index, y=dd.values * 100,
-            name="Drawdown", line=dict(color="#ef4444", width=1),
-            fill="tozeroy", fillcolor="rgba(239,68,68,0.2)",
+            name="Drawdown", line=dict(color=PINK, width=1.5),
+            fill="tozeroy", fillcolor="rgba(239,70,135,0.2)",
             hovertemplate="<b>%{x|%b %d, %Y}</b><br>Drawdown: %{y:.1f}%<extra></extra>",
         ),
         row=2, col=1,
     )
 
     fig.update_layout(
-        title=dict(text=title, font=dict(size=16, color="#e2e8f0")),
+        title=dict(text=title, font=dict(size=16, color=TEXT)),
         template="plotly_dark",
         height=500,
         margin=dict(l=50, r=20, t=50, b=20),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0.5, xanchor="center"),
-        paper_bgcolor="#0e1117",
-        plot_bgcolor="#0e1117",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0.5, xanchor="center",
+                    font=dict(color=MUTED)),
+        paper_bgcolor=BG,
+        plot_bgcolor=BG_CARD,
         hovermode="x unified",
     )
-    fig.update_yaxes(title_text="Portfolio Value ($)", row=1, col=1, gridcolor="#1e293b")
-    fig.update_yaxes(title_text="Drawdown (%)", row=2, col=1, gridcolor="#1e293b")
-    fig.update_xaxes(gridcolor="#1e293b")
+    fig.update_yaxes(title_text="Portfolio Value ($)", title_font=dict(color=MUTED),
+                     row=1, col=1, gridcolor=GRID, tickfont=dict(color=MUTED))
+    fig.update_yaxes(title_text="Drawdown (%)", title_font=dict(color=MUTED),
+                     row=2, col=1, gridcolor=GRID, tickfont=dict(color=MUTED))
+    fig.update_xaxes(gridcolor=GRID, tickfont=dict(color=MUTED))
     return fig
 
 
@@ -398,22 +426,24 @@ def plot_monthly_heatmap(monthly_returns):
         z=table.values,
         x=table.columns,
         y=table.index.astype(str),
-        colorscale=[[0, "#ef4444"], [0.5, "#1a1a2e"], [1, "#22c55e"]],
+        colorscale=[[0, PINK], [0.5, BG_CARD], [1, MINT]],
         zmid=0,
         text=[[f"{v:.1f}%" if not np.isnan(v) else "" for v in row] for row in table.values],
         texttemplate="%{text}",
-        textfont={"size": 11},
+        textfont={"size": 11, "color": TEXT},
         hoverongaps=False,
         hovertemplate="<b>%{y} %{x}</b><br>Return: %{z:.2f}%<extra></extra>",
     ))
 
     fig.update_layout(
-        title=dict(text="Monthly Returns (%)", font=dict(size=14, color="#e2e8f0")),
+        title=dict(text="Monthly Returns (%)", font=dict(size=14, color=TEXT)),
         template="plotly_dark",
         height=max(200, 60 * len(table)),
         margin=dict(l=50, r=20, t=40, b=20),
-        paper_bgcolor="#0e1117",
-        plot_bgcolor="#0e1117",
+        paper_bgcolor=BG,
+        plot_bgcolor=BG_CARD,
+        xaxis=dict(tickfont=dict(color=MUTED)),
+        yaxis=dict(tickfont=dict(color=MUTED)),
     )
     return fig
 
@@ -424,26 +454,29 @@ def plot_return_distribution(daily_returns):
     fig.add_trace(go.Histogram(
         x=daily_returns.values * 100,
         nbinsx=50,
-        marker_color="#6366f1",
-        opacity=0.8,
+        marker_color=TEAL,
+        marker_line=dict(color=MINT, width=0.5),
+        opacity=0.9,
         name="Daily Returns",
         hovertemplate="Return: %{x:.2f}%<br>Count: %{y}<extra></extra>",
     ))
     fig.add_vline(
-        x=mean_r, line_dash="dash", line_color="#22c55e",
+        x=mean_r, line_dash="dash", line_color=ORANGE,
         annotation_text=f"Mean: {mean_r:.2f}%",
         annotation_position="top right",
-        annotation_font_color="#22c55e",
+        annotation_font_color=ORANGE,
     )
     fig.update_layout(
-        title=dict(text="Return Distribution", font=dict(size=14, color="#e2e8f0")),
+        title=dict(text="Return Distribution", font=dict(size=14, color=TEXT)),
         xaxis_title="Daily Return (%)",
         yaxis_title="Frequency",
         template="plotly_dark",
         height=300,
         margin=dict(l=50, r=20, t=40, b=20),
-        paper_bgcolor="#0e1117",
-        plot_bgcolor="#0e1117",
+        paper_bgcolor=BG,
+        plot_bgcolor=BG_CARD,
+        xaxis=dict(tickfont=dict(color=MUTED), gridcolor=GRID),
+        yaxis=dict(tickfont=dict(color=MUTED), gridcolor=GRID),
     )
     return fig
 
@@ -460,20 +493,22 @@ def plot_correlation_matrix(results):
         z=corr.values,
         x=corr.columns.tolist(),
         y=corr.index.tolist(),
-        colorscale=[[0, "#ef4444"], [0.5, "#1e293b"], [1, "#22c55e"]],
+        colorscale=[[0, PINK], [0.5, BG_CARD], [1, MINT]],
         zmin=-1, zmax=1, zmid=0,
         text=[[f"{v:.2f}" for v in row] for row in corr.values],
         texttemplate="%{text}",
-        textfont={"size": 11},
+        textfont={"size": 11, "color": TEXT},
         hovertemplate="<b>%{x} vs %{y}</b><br>Correlation: %{z:.3f}<extra></extra>",
     ))
     fig.update_layout(
-        title=dict(text="Return Correlation Matrix", font=dict(size=14, color="#e2e8f0")),
+        title=dict(text="Return Correlation Matrix", font=dict(size=14, color=TEXT)),
         template="plotly_dark",
         height=400,
         margin=dict(l=20, r=20, t=50, b=20),
-        paper_bgcolor="#0e1117",
-        plot_bgcolor="#0e1117",
+        paper_bgcolor=BG,
+        plot_bgcolor=BG_CARD,
+        xaxis=dict(tickfont=dict(color=MUTED)),
+        yaxis=dict(tickfont=dict(color=MUTED)),
     )
     return fig
 
@@ -591,13 +626,13 @@ elif mode == "🔬 Single Alpha":
             st.markdown(
                 f"""
                 <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
-                    <div style="background:#1e293b; border-radius:8px; padding:10px 14px;">
-                        <div style="font-size:10px; color:#64748b; text-transform:uppercase; letter-spacing:1px;">Universe</div>
-                        <div style="font-size:15px; font-weight:600; color:#e2e8f0; margin-top:2px;">{len(tickers)} stocks</div>
+                    <div style="background:#0d2535; border-radius:8px; padding:10px 14px; border:1px solid #185D7A;">
+                        <div style="font-size:10px; color:#7ec8d8; text-transform:uppercase; letter-spacing:1px;">Universe</div>
+                        <div style="font-size:15px; font-weight:600; color:#e8f4f8; margin-top:2px;">{len(tickers)} stocks</div>
                     </div>
-                    <div style="background:#1e293b; border-radius:8px; padding:10px 14px;">
-                        <div style="font-size:10px; color:#64748b; text-transform:uppercase; letter-spacing:1px;">Period</div>
-                        <div style="font-size:15px; font-weight:600; color:#e2e8f0; margin-top:2px;">{(end_date - start_date).days} days</div>
+                    <div style="background:#0d2535; border-radius:8px; padding:10px 14px; border:1px solid #185D7A;">
+                        <div style="font-size:10px; color:#7ec8d8; text-transform:uppercase; letter-spacing:1px;">Period</div>
+                        <div style="font-size:15px; font-weight:600; color:#e8f4f8; margin-top:2px;">{(end_date - start_date).days} days</div>
                     </div>
                 </div>
                 """,
@@ -721,7 +756,7 @@ elif mode == "⚔️ Compare Alphas":
             )
         else:
             # Overlay equity curves
-            colors = ["#6366f1", "#22c55e", "#f59e0b", "#ef4444", "#ec4899", "#06b6d4"]
+            colors = COMPARE_COLORS
             fig = go.Figure()
             last_eq = None
             for i, (num, res) in enumerate(results.items()):
@@ -738,23 +773,24 @@ elif mode == "⚔️ Compare Alphas":
                 fig.add_trace(go.Scatter(
                     x=last_eq.index, y=[1] * len(last_eq),
                     name="$1 Baseline",
-                    line=dict(color="#94a3b8", width=1, dash="dash"),
+                    line=dict(color=MUTED, width=1, dash="dash"),
                     hoverinfo="skip",
                 ))
 
             fig.update_layout(
-                title=dict(text="Equity Curves", font=dict(size=16, color="#e2e8f0")),
+                title=dict(text="Equity Curves", font=dict(size=16, color=TEXT)),
                 template="plotly_dark",
                 height=500,
                 margin=dict(l=50, r=20, t=50, b=20),
-                paper_bgcolor="#0e1117",
-                plot_bgcolor="#0e1117",
-                legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0.5, xanchor="center"),
+                paper_bgcolor=BG,
+                plot_bgcolor=BG_CARD,
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0.5,
+                            xanchor="center", font=dict(color=MUTED)),
                 yaxis_title="Portfolio Value ($)",
                 hovermode="x unified",
             )
-            fig.update_xaxes(gridcolor="#1e293b")
-            fig.update_yaxes(gridcolor="#1e293b")
+            fig.update_xaxes(gridcolor=GRID, tickfont=dict(color=MUTED))
+            fig.update_yaxes(gridcolor=GRID, tickfont=dict(color=MUTED))
             st.plotly_chart(fig, use_container_width=True)
 
             # Metrics comparison table
@@ -820,23 +856,26 @@ elif mode == "⚔️ Compare Alphas":
                     template="plotly_dark",
                     height=400,
                     margin=dict(l=30, r=30, t=20, b=60),
-                    paper_bgcolor="#0e1117",
-                    plot_bgcolor="#0e1117",
+                    paper_bgcolor=BG,
+                    plot_bgcolor=BG,
                     polar=dict(
-                        bgcolor="#0e1117",
+                        bgcolor=BG_CARD,
                         radialaxis=dict(
                             visible=True,
                             range=[0, 1],
                             tickvals=[0, 0.25, 0.5, 0.75, 1.0],
                             ticktext=["Low", "", "Mid", "", "High"],
-                            gridcolor="#1e293b",
-                            tickfont=dict(size=9, color="#64748b"),
+                            gridcolor=GRID,
+                            tickfont=dict(size=9, color=MUTED),
+                            linecolor=TEAL,
                         ),
                         angularaxis=dict(
-                            tickfont=dict(size=12, color="#cbd5e1"),
+                            tickfont=dict(size=12, color=TEXT),
+                            linecolor=TEAL,
+                            gridcolor=GRID,
                         ),
                     ),
-                    legend=dict(orientation="h", y=-0.15, font=dict(size=11)),
+                    legend=dict(orientation="h", y=-0.15, font=dict(size=11, color=MUTED)),
                 )
                 st.plotly_chart(fig_radar, use_container_width=True)
 
