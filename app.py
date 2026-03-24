@@ -129,7 +129,7 @@ st.markdown("""
     .formula-block code {
         font-family: "SFMono-Regular", Consolas, monospace;
         font-size: 11px;
-        color: #6FE3CC;
+        color: #ffffff;
         white-space: pre-wrap;
         word-break: break-all;
         line-height: 1.6;
