@@ -112,21 +112,33 @@ st.markdown("""
     /* ── Alpha cards ── */
     .alpha-num {
         font-size: 11px;
-        color: #4a8a9a;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 1px;
+        /* readable on both light and dark via native Streamlit caption */
     }
-    .alpha-name {
-        font-size: 15px;
+    /* formula block — always forced-dark so colors are predictable */
+    .formula-block {
+        background: #0d2535;
+        border: 1px solid #185D7A;
+        border-radius: 8px;
+        padding: 10px 14px;
+        margin: 8px 0 4px 0;
+        overflow-x: auto;
+    }
+    .formula-block code {
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 11px;
+        color: #6FE3CC;
+        white-space: pre-wrap;
+        word-break: break-all;
+        line-height: 1.6;
+    }
+    /* section header matching Factor Profile style */
+    .section-header {
+        font-size: 22px;
         font-weight: 700;
-        color: #e8f4f8;
-        margin: 4px 0;
-    }
-    .alpha-desc {
-        font-size: 13px;
-        color: #7ec8d8;
-        line-height: 1.5;
+        margin: 0 0 4px 0;
     }
 
     /* ── Hero banner ── */
@@ -501,10 +513,9 @@ def plot_correlation_matrix(results):
         hovertemplate="<b>%{x} vs %{y}</b><br>Correlation: %{z:.3f}<extra></extra>",
     ))
     fig.update_layout(
-        title=dict(text="Return Correlation Matrix", font=dict(size=14, color=TEXT)),
         template="plotly_dark",
         height=400,
-        margin=dict(l=20, r=20, t=50, b=20),
+        margin=dict(l=20, r=20, t=20, b=20),
         paper_bgcolor=BG,
         plot_bgcolor=BG_CARD,
         xaxis=dict(tickfont=dict(color=MUTED)),
@@ -573,14 +584,28 @@ if mode == "📋 Catalog":
                         with st.container(border=True):
                             # Header row: number + pill
                             h_col, p_col = st.columns([1, 2])
-                            h_col.markdown(f'<div class="alpha-num">Alpha #{a["num"]}</div>', unsafe_allow_html=True)
+                            h_col.caption(f"Alpha #{a['num']}")
                             p_col.markdown(category_pill(a["category"]), unsafe_allow_html=True)
 
-                            st.markdown(f'<div class="alpha-name">{a["name"]}</div>', unsafe_allow_html=True)
-                            st.markdown(f'<div class="alpha-desc">{a["description"]}</div>', unsafe_allow_html=True)
+                            # Name — native bold, theme-aware (dark on white / light on dark)
+                            st.markdown(f"**{a['name']}**")
+                            # Description — native text, theme-aware
+                            st.markdown(
+                                f"<span style='font-size:13px; line-height:1.5;'>{a['description']}</span>",
+                                unsafe_allow_html=True,
+                            )
 
-                            with st.expander("Formula"):
-                                st.code(a["formula"], language="python")
+                            # Formula — always-visible, forced-dark block, smaller font
+                            formula_safe = (
+                                a["formula"]
+                                .replace("&", "&amp;")
+                                .replace("<", "&lt;")
+                                .replace(">", "&gt;")
+                            )
+                            st.markdown(
+                                f'<div class="formula-block"><code>{formula_safe}</code></div>',
+                                unsafe_allow_html=True,
+                            )
 
                             if st.button("Backtest →", key=f"bt_{a['num']}", use_container_width=True):
                                 st.session_state.jump_to_alpha = a["num"]
@@ -801,13 +826,31 @@ elif mode == "⚔️ Compare Alphas":
                 comp_data[f"Alpha #{num}"] = res["metrics"]
             comp_df = pd.DataFrame(comp_data).T
             comp_df.index.name = "Alpha"
-            st.dataframe(comp_df, use_container_width=True)
+
+            # Color Annual Return: mint (green) if positive, pink (red) if negative
+            def _color_return(val):
+                try:
+                    v = float(str(val).strip("%")) / 100 if "%" in str(val) else float(val)
+                    return f"color: {MINT}; font-weight: 600" if v > 0 else f"color: {PINK}; font-weight: 600"
+                except Exception:
+                    return ""
+
+            styled_comp = comp_df.style
+            if "Annual Return" in comp_df.columns:
+                styled_comp = styled_comp.map(_color_return, subset=["Annual Return"])
+            st.dataframe(styled_comp, use_container_width=True)
 
             # Correlation matrix + radar side by side
             col_corr, col_radar = st.columns(2)
 
             with col_corr:
-                st.plotly_chart(plot_correlation_matrix(results), use_container_width=True)
+                # Header matches Factor Profile alignment
+                st.subheader("Return Correlation Matrix")
+                st.caption("Pearson correlation of daily returns — lower = better diversification.")
+                st.plotly_chart(
+                    plot_correlation_matrix(results),
+                    use_container_width=True,
+                )
 
             with col_radar:
                 st.subheader("Factor Profile")
